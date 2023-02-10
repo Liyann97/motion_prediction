@@ -9,6 +9,10 @@ import keras
 from config import get_configuration
 os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
+# 保存所有超参数至单独的txt文件（字典）
+# 完成数据读取部分的代码优化
+# 完成模型部分建立的优化
+
 # 基本参数设置
 # wave:0, surge:1, sway:2, heave:3, roll:4, pitch:5, yaw:6
 window, lag, input_index, output_index = get_configuration()
