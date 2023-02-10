@@ -1,5 +1,6 @@
 import sys
-
+import os
+from datetime import datetime
 import numpy as np
 from numpy import array
 
@@ -39,7 +40,7 @@ def slice2pair(data_series, window, lag, input_index, output_index):
     y_dataset = []
     for i in range(length - lag - window):
         x_dataset.append(data_series[i:i + window + lag, input_index])
-    for j in range(window - 1, length - lag - 1):
+    for j in range(window, length - lag):
         y_dataset.append(data_series[j, output_index])
 
     x = np.array(x_dataset)
@@ -56,3 +57,14 @@ def data_generator(data_series, window, lag, input_index, output_index):
     return x_data, y_data
 
 
+if __name__ == '__main__':
+    data = np.loadtxt(r'D:/motion_prediction/motion_prediction/my_data/W1/1.dat')
+    x, y = data_generator(data, window=128, lag=0, input_index=[0],
+                                    output_index=[3])
+    print(x.shape)
+    print(y.shape)
+    print(datetime.now())
+    time = datetime.now()
+    na = str(time.month) + str(time.day) + str(time.hour) + str(time.minute)
+    print(na.zfill(8))
+    os.makedirs(na.zfill(8))
