@@ -7,6 +7,8 @@ from data_processed import data_generator
 from datetime import datetime
 import keras
 from config import get_configuration
+from build_model import build_lstm_model
+
 os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 # 保存所有超参数至单独的txt文件（字典）
@@ -20,21 +22,33 @@ window, lag, input_index, output_index = get_configuration()
 
 # 训练数据集准备
 proDir = os.path.split(os.path.realpath(__file__))[0]
-dataPath = os.path.join(proDir, "my_data")
+dataPath = os.path.join(proDir, "new_data")
 resultPath = os.path.join(proDir, 'results')
 
 
-nb_data = 27
+# nb_data = 27
+# for i in range(nb_data):
+#     # W1: 9, W2: 8, W3: 6, W4: 4
+#     if i < 9:
+#         locals()['data' + str(i)] = np.loadtxt(os.path.join(dataPath, "W1", str(i + 1) + '.dat'))
+#     elif i < 17:
+#         locals()['data' + str(i)] = np.loadtxt(os.path.join(dataPath, "W2", str(i - 8) + '.dat'))
+#     elif i < 23:
+#         locals()['data' + str(i)] = np.loadtxt(os.path.join(dataPath, "W3", str(i - 16) + '.dat'))
+#     else:
+#         locals()['data' + str(i)] = np.loadtxt(os.path.join(dataPath, "W4", str(i - 22) + '.dat'))
+
+nb_data = 12
 for i in range(nb_data):
     # W1: 9, W2: 8, W3: 6, W4: 4
-    if i < 9:
+    if i < 3:
         locals()['data' + str(i)] = np.loadtxt(os.path.join(dataPath, "W1", str(i + 1) + '.dat'))
-    elif i < 17:
-        locals()['data' + str(i)] = np.loadtxt(os.path.join(dataPath, "W2", str(i - 8) + '.dat'))
-    elif i < 23:
-        locals()['data' + str(i)] = np.loadtxt(os.path.join(dataPath, "W3", str(i - 16) + '.dat'))
+    elif i < 6:
+        locals()['data' + str(i)] = np.loadtxt(os.path.join(dataPath, "W2", str(i - 2) + '.dat'))
+    elif i < 9:
+        locals()['data' + str(i)] = np.loadtxt(os.path.join(dataPath, "W3", str(i - 5) + '.dat'))
     else:
-        locals()['data' + str(i)] = np.loadtxt(os.path.join(dataPath, "W4", str(i - 22) + '.dat'))
+        locals()['data' + str(i)] = np.loadtxt(os.path.join(dataPath, "W4", str(i - 8) + '.dat'))
 
 for j in range(nb_data):
     locals()['x_train' + str(j)], locals()['y_train' + str(j)] = data_generator(locals()['data' + str(j)],
@@ -52,7 +66,7 @@ for j in range(1, nb_data):
     del locals()['x_train' + str(j)], locals()['y_train' + str(j)]
 
 # 测试数据集准备
-test_data = np.loadtxt(os.path.join(dataPath, "W1", '10.dat'))
+test_data = np.loadtxt(os.path.join(dataPath, "W4", '4.dat'))
 x_test, y_test = data_generator(test_data, window=window, lag=lag, input_index=input_index, output_index=output_index)
 
 print(x_train.shape)
@@ -66,21 +80,9 @@ np.random.set_state(state)
 np.random.shuffle(y_train)
 
 
-def build_lstm_model():
-    model = keras.models.Sequential()
-    model.add(keras.layers.LSTM(128, input_shape=(x_train.shape[1], x_train.shape[2]), return_sequences=False))
-    model.add(keras.layers.Dense(128, activation='relu'))
-    model.add(keras.layers.Dense(1, activation='linear'))
-
-    model.compile(loss='mse', optimizer='adam')
-    keras.optimizers.Adam(lr=0.0001)
-
-    return model
-
-
 def run_task(model=None, epoch=0):
     if model is None:
-        model = build_lstm_model()
+        model = build_lstm_model(x_train.shape[1], x_train.shape[2])
         print("We will build the model")
     else:
         model = keras.models.load_model(model)

@@ -1,5 +1,5 @@
 [hyperParameter]
-window = 128
+window = 256
 lag = 0
 input_index = 0
 output_index = 3
